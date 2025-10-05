@@ -14,8 +14,10 @@ const ProductList = () => {
   const scrollLeftStart = useRef(0);
 
   useEffect(() => {
+    axios;
     axios
-      .get("http://localhost:5000/api/products")
+      .get(`${import.meta.env.VITE_API_URL}/api/products`)
+
       .then((res) => {
         setProducts(res.data);
         setSelectedColors(res.data.map(() => "yellow"));
