@@ -8,7 +8,7 @@ const ProductList = () => {
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  // Swipe state
+  // --- Swipe State ---
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeftStart = useRef(0);
@@ -29,52 +29,42 @@ const ProductList = () => {
     setSelectedColors(newColors);
   };
 
-  const scrollLeft = () => {
-    carouselRef.current?.scrollBy({ left: -500, behavior: "smooth" });
+  // --- Scroll (smooth) ---
+  const scrollByAmount = (offset: number) => {
+    carouselRef.current?.scrollBy({ left: offset, behavior: "smooth" });
   };
+  const scrollLeft = () => scrollByAmount(-500);
+  const scrollRight = () => scrollByAmount(500);
 
-  const scrollRight = () => {
-    carouselRef.current?.scrollBy({ left: 500, behavior: "smooth" });
-  };
-
-  // --- Swipe Handlers ---
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  // --- Unified Drag Handlers ---
+  const startDrag = (clientX: number) => {
     isDragging.current = true;
-    startX.current = e.pageX - (carouselRef.current?.offsetLeft || 0);
+    startX.current = clientX - (carouselRef.current?.offsetLeft || 0);
     scrollLeftStart.current = carouselRef.current?.scrollLeft || 0;
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging.current) return;
-    e.preventDefault();
-    const x = e.pageX - (carouselRef.current?.offsetLeft || 0);
-    const walk = x - startX.current;
-    if (carouselRef.current)
-      carouselRef.current.scrollLeft = scrollLeftStart.current - walk;
+  const moveDrag = (clientX: number) => {
+    if (!isDragging.current || !carouselRef.current) return;
+    const x = clientX - (carouselRef.current.offsetLeft || 0);
+    carouselRef.current.scrollLeft =
+      scrollLeftStart.current - (x - startX.current);
   };
 
-  const handleMouseUp = () => {
+  const endDrag = () => {
     isDragging.current = false;
   };
 
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    isDragging.current = true;
-    startX.current =
-      e.touches[0].pageX - (carouselRef.current?.offsetLeft || 0);
-    scrollLeftStart.current = carouselRef.current?.scrollLeft || 0;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!isDragging.current) return;
-    const x = e.touches[0].pageX - (carouselRef.current?.offsetLeft || 0);
-    const walk = x - startX.current;
-    if (carouselRef.current)
-      carouselRef.current.scrollLeft = scrollLeftStart.current - walk;
-  };
-
-  const handleTouchEnd = () => {
-    isDragging.current = false;
-  };
+  // --- Event Binding ---
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) =>
+    startDrag(e.pageX);
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) =>
+    moveDrag(e.pageX);
+  const handleMouseUp = endDrag;
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) =>
+    startDrag(e.touches[0].pageX);
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) =>
+    moveDrag(e.touches[0].pageX);
+  const handleTouchEnd = endDrag;
 
   return (
     <div className="min-h-screen relative ">
@@ -97,7 +87,13 @@ const ProductList = () => {
 
             <div
               ref={carouselRef}
-              className="carousel-container flex overflow-x-auto gap-30 pb-4 px-4 scroll-smooth cursor-grab"
+              className="
+                carousel-container flex overflow-x-auto 
+                gap-4 sm:gap-6 md:gap-8 lg:gap-10 
+                px-2 sm:px-4 py-2 
+                scroll-smooth cursor-grab
+                scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200
+              "
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}

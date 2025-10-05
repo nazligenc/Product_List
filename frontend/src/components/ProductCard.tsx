@@ -15,8 +15,8 @@ const ProductCard = ({
   onChangeColor,
 }: ProductCardProps) => {
   return (
-    <div className="flex-none w-36 sm:w-44 md:w-52 lg:w-60 p-3 sm:p-4 md:p-5 lg:p-6">
-      <div className="aspect-square bg-gray-100 rounded-xl mb-2 sm:mb-3 md:mb-4 flex items-center justify-center">
+    <div className="flex-none w-full sm:w-[50%] md:w-[30%] lg:w-[22%] xl:w-[18%] max-w-xs p-3 sm:p-4 md:p-5">
+      <div className="aspect-square bg-gray-100 rounded-xl mb-3 flex items-center justify-center overflow-hidden">
         <img
           src={product.images[selectedColor]}
           alt={product.name}
@@ -24,16 +24,15 @@ const ProductCard = ({
         />
       </div>
 
-      <h3 className="text-sm sm:text-base md:text-lg lg:text-lg font-medium text-gray-800 mb-1 sm:mb-2">
+      <h3 className="text-sm sm:text-base md:text-lg font-medium text-gray-800 mb-1">
         {product.name}
       </h3>
 
-      <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 mb-2 sm:mb-4">
+      <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 mb-3">
         ${priceUSD} USD
       </p>
 
       <ColorSelector selectedColor={selectedColor} onChange={onChangeColor} />
-
       <StarRating score={product.popularityScore * 5} />
     </div>
   );
